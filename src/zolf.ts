@@ -1,56 +1,57 @@
-type Environment = {
-  weather: WeatherEffect;
-};
+import { ed, getClubFromDistanceToHole } from './utils';
 
-type Lie = {
-  shot: number;
-  lay: 'Rough' | 'Fescue' | 'Heavy Rough' | 'Fairway' | 'Teebox';
-  distanceToHole: number;
-};
-
-interface Player {
-  control: number;
-  patience: number;
-  brainSize: number;
-  tilt: number;
-  alive: boolean;
-  swing(environment: Environment, lie: Lie): void;
+function guessProficiency(): ClubProficiency {
+  return {
+    '3': Math.random(),
+    '4': Math.random(),
+    '5': Math.random(),
+    '6': Math.random(),
+    '7': Math.random(),
+    '8': Math.random(),
+    '9': Math.random(),
+    D: Math.random(),
+    P: Math.random(),
+    PW: Math.random(),
+  };
 }
-
-type PlayerConstructor = Exclude<Player, 'alive'>;
-
-type WeatherEffect = {
-  name: string;
-  roll: () => boolean;
-  effect: () => any;
-};
-
-class Person implements Player {
-  control;
-  patience;
-  brainSize;
-  tilt;
-  alive;
+export class Person implements Player {
+  stats = {
+    control: Math.random(),
+    patience: Math.random(),
+    brainSize: Math.random(),
+    tilt: Math.random(),
+    alive: true,
+    proficiency: guessProficiency(),
+  };
+  hole;
+  id;
+  name;
+  scoreCard;
+  afflictions;
+  lie;
+  strokes;
 
   constructor({
-    control,
-    patience,
-    brainSize,
-    tilt,
-    alive,
+    stats,
+    afflictions,
+    hole,
+    id,
+    lie,
+    name,
+    scoreCard,
+    strokes,
   }: PlayerConstructor) {
-    this.control = control;
-    this.patience = patience;
-    this.brainSize = brainSize;
-    this.tilt = tilt;
-    this.alive = alive;
+    this.stats = stats;
+    this.hole = hole;
+    this.id = id;
+    this.name = name;
+    this.scoreCard = scoreCard;
+    this.afflictions = afflictions;
+    this.lie = lie;
+    this.strokes = strokes;
   }
 
-  swing(environment: Environment, lie: Lie) {
-    // The club the player should hit based off of distance
-    const idealClub = getClubFromDistanceToHole(lie.distanceToHole);
-    let playersClub = idealClub;
-
+  rollBrainSize() {
     // Number from 1 - 20 to add or subtract to the distance
     const brainSizeDistanceModifier = Math.floor(Math.random() * 20);
     // 50/50 chance to add or remove the distance mod. (Club up or club down)
@@ -58,30 +59,69 @@ class Person implements Player {
       Math.random() > 0.5
         ? -brainSizeDistanceModifier
         : brainSizeDistanceModifier;
+    return addOrRemoveDistance;
+  }
+
+  rollControl() {
+    // todo: we should apply Mental here
+    const controlRoll = Math.random();
+    if (controlRoll > this.stats.control) {
+      const controlDelta = controlRoll - this.stats.control;
+      const slicePercent = 1 - ed(controlDelta);
+      return slicePercent;
+    }
+    return false;
+  }
+
+  advanceToNextHole() {}
+
+  swing(environment: Environment, lie: Lie) {
+    // The club the player should hit based off of distance
+    const idealClub = getClubFromDistanceToHole(lie.distanceToHole);
+    let playersClub = idealClub;
+
     const brainSizeClub = getClubFromDistanceToHole(
-      lie.distanceToHole + addOrRemoveDistance
+      lie.distanceToHole + this.rollBrainSize()
     );
+
     playersClub = brainSizeClub;
-    // const clubFromBrainSize =
-  }
-}
 
-function getClubFromDistanceToHole(distanceToHole: number): string {
-  let club: string;
-  if (distanceToHole < 136) club = 'PW';
-  else if (distanceToHole > 136 && distanceToHole < 148) club = '9';
-  else if (distanceToHole > 148 && distanceToHole < 160) club = '8';
-  else if (distanceToHole > 160 && distanceToHole < 172) club = '7';
-  else if (distanceToHole > 172 && distanceToHole < 183) club = '6';
-  else if (distanceToHole > 183 && distanceToHole < 194) club = '5';
-  else if (distanceToHole > 194 && distanceToHole < 203) club = '4';
-  else if (distanceToHole > 203 && distanceToHole < 212) club = '3';
-  else if (distanceToHole > 212 && distanceToHole < 275) club = 'driver';
-  else {
-    throw new Error(
-      'Could not find a suitable club? distance: ' + distanceToHole
-    );
+    const isOnGreen = playersClub === 'P' ? true : false;
+
+    let shotDistance = this.stats.proficiency[playersClub];
+
+    const didControlRoll = this.rollControl();
+    if (didControlRoll) {
+      shotDistance *= didControlRoll;
+      // get shotDistance delta to figure out slice distance
+    }
+
+    // todo: Apply Weather effects here
+
+    if (isOnGreen) {
+      // apply finesse for putting
+    }
+
+    // use slice distance (as inaccuracy) to determine the new lie
+    this.proceedToNextShot({ shotDistance, inaccuracy: 0 });
   }
 
-  return club;
+  // todo: determine the new lie using inaccuracy
+  proceedToNextShot({
+    shotDistance,
+    inaccuracy,
+  }: {
+    shotDistance: number;
+    inaccuracy: number;
+  }) {
+    this.strokes += 1;
+    this.lie.distanceToHole -= shotDistance;
+  }
+
+  proceedToNextHole() {
+    this.scoreCard.push(this.strokes);
+    this.hole += 1;
+    this.strokes = 0;
+    this.lie.condition = 'Teebox';
+  }
 }
