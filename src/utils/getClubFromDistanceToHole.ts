@@ -29,21 +29,35 @@ export function c(d: number, condition: Lie['condition']): Clubs {
     return is > min && is < max;
   }
 
-  const options = Object.keys(clubDistances).reduce((acc, key) => {
+  let options = Object.keys(clubDistances).reduce((acc, key) => {
     const _d = clubDistances[key as Clubs];
 
     if (isBetween(_d[0], _d[1], d)) {
+      if (key === 'D' && condition !== 'Teebox') return acc;
       acc.push(key as Clubs);
     }
 
     return acc;
   }, [] as Clubs[]);
 
-  return options[clubUpX] || d < 40 ? 'P' : 'D';
+  // console.log(clubUpX, options, d, condition);
+
+  if (options.includes('P')) return 'P';
+
+  if (clubUpX >= options.length && options.length !== 0) {
+    return options[options.length - 1];
+  } else if (d > clubDistances['D'][0] && condition === 'Teebox') {
+    return 'D';
+  } else if (d > clubDistances['D'][0]) {
+    options = ['3', '4', '5', '6'];
+  }
+
+  return options[clubUpX];
 }
 
 export const clubDistances: Record<Clubs, number[]> = {
-  P: [40, 40],
+  P: [0, 40],
+  AW: [40, 120],
   PW: [120, 140],
   '9': [140, 170],
   '8': [155, 185],
@@ -52,5 +66,5 @@ export const clubDistances: Record<Clubs, number[]> = {
   '5': [190, 230],
   '4': [200, 250],
   '3': [210, 260],
-  D: [275, 250],
+  D: [250, 275],
 };
