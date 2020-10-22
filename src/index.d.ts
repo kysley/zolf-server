@@ -1,15 +1,28 @@
-type Environment = {
-  weather: WeatherEffect;
-};
-
 type Lie = {
-  condition: 'Rough' | 'Fescue' | 'Heavy Rough' | 'Fairway' | 'Teebox';
+  condition:
+    | 'Rough'
+    | 'Fescue'
+    | 'Heavy Rough'
+    | 'Fairway'
+    | 'Teebox'
+    | 'Green';
   distanceToHole: number;
 };
 
 type Clubs = 'P' | 'PW' | '9' | '8' | '7' | '6' | '5' | '4' | '3' | 'D';
 
 type ClubProficiency = Record<Clubs, number>;
+
+type Hole = {
+  yardage: number;
+  par: number;
+};
+
+type Course = {
+  name: string;
+  length: number;
+  holes: Hole[];
+};
 
 type PlayerStats = {
   control: number;
@@ -25,21 +38,27 @@ type Affliction = {};
 type WeatherNames = 'Hail';
 type AfflictionNames = 'Roid Rage';
 
+interface Round {
+  players: Player[];
+  course: Course;
+  weather: WeatherEffect;
+}
+
 interface Player {
   id: string;
   name: string;
   hole: number;
-  scoreCard: [number];
-  afflictions: [Affliction];
+  scoreCard: number[];
+  afflictions: Affliction[];
   strokes: number;
 
   stats: PlayerStats;
   lie: Lie;
+  course: Course;
+  start(): void;
 
-  swing(environment: Environment, lie: Lie): void;
+  swing(): void;
 }
-
-type PlayerConstructor = Exclude<Player, 'alive'>;
 
 type EventMessage = {
   info: {

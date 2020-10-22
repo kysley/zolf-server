@@ -3,7 +3,7 @@ import produce from 'immer';
 class Hail implements WeatherEffect {
   name = 'Hail';
 
-  roll({ player }: { player: Player }) {
+  roll() {
     const roll = Math.random() * 100;
     if (roll < 5) return true;
     return false;

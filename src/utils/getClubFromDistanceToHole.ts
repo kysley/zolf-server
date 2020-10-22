@@ -1,7 +1,7 @@
 export function getClubFromDistanceToHole(distanceToHole: number): Clubs {
   let club: Clubs;
-  if (distanceToHole < 50) club = 'P';
-  else if (distanceToHole > 50 && distanceToHole < 136) club = 'PW';
+  if (distanceToHole < 40) club = 'P';
+  else if (distanceToHole > 40 && distanceToHole < 136) club = 'PW';
   else if (distanceToHole > 136 && distanceToHole < 148) club = '9';
   else if (distanceToHole > 148 && distanceToHole < 160) club = '8';
   else if (distanceToHole > 160 && distanceToHole < 172) club = '7';
