@@ -1,26 +1,6 @@
-// export function getClubFromDistanceToHole(distanceToHole: number): Clubs {
-//   let club: Clubs;
-//   if (distanceToHole < 40) club = 'P';
-//   else if (distanceToHole > 40 && distanceToHole < 120) club = 'PW';
-//   else if (distanceToHole > 140 && distanceToHole < 155) club = '9';
-//   else if (distanceToHole > 148 && distanceToHole < 160) club = '8';
-//   else if (distanceToHole > 160 && distanceToHole < 172) club = '7';
-//   else if (distanceToHole > 172 && distanceToHole < 183) club = '6';
-//   else if (distanceToHole > 183 && distanceToHole < 194) club = '5';
-//   else if (distanceToHole > 194 && distanceToHole < 203) club = '4';
-//   else if (distanceToHole > 203 && distanceToHole < 212) club = '3';
-//   else if (distanceToHole > 212) club = 'D';
-//   else {
-//     throw new Error(
-//       'Could not find a suitable club? distance: ' + distanceToHole
-//     );
-//   }
-
-//   return club;
-// }
-
 export function c(d: number, condition: Lie['condition']): Clubs {
   let clubUpX = 0;
+  // Based on the lie, we will club up a certain number of times
   if (condition === 'Rough') clubUpX = 1;
   else if (condition === 'Heavy Rough') clubUpX = 2;
   else if (condition === 'Fescue') clubUpX = 3;
@@ -32,7 +12,9 @@ export function c(d: number, condition: Lie['condition']): Clubs {
   let options = Object.keys(clubDistances).reduce((acc, key) => {
     const _d = clubDistances[key as Clubs];
 
+    // If the distance to the hole is within the clubs' distance bounds
     if (isBetween(_d[0], _d[1], d)) {
+      // For now, lets not let them hit the driver off the fairway (etc.) maybe we can revisit this idea
       if (key === 'D' && condition !== 'Teebox') return acc;
       acc.push(key as Clubs);
     }
@@ -42,14 +24,24 @@ export function c(d: number, condition: Lie['condition']): Clubs {
 
   // console.log(clubUpX, options, d, condition);
 
+  // Always return putter if we can
   if (options.includes('P')) return 'P';
+  if (d > clubDistances['D'][0] && condition === 'Teebox') return 'D';
+  else if (d > clubDistances['D'][0]) options = ['3', '4', '5', '6'];
 
-  if (clubUpX >= options.length && options.length !== 0) {
-    return options[options.length - 1];
-  } else if (d > clubDistances['D'][0] && condition === 'Teebox') {
-    return 'D';
-  } else if (d > clubDistances['D'][0]) {
-    options = ['3', '4', '5', '6'];
+  const randomClubFromOptions =
+    options[Math.floor(Math.random() * options.length)];
+
+  const clubIdx = Object.keys(clubDistances).findIndex(
+    (key) => key === randomClubFromOptions
+  );
+
+  if (clubIdx !== -1) {
+    // We are clubbing up too many times, return highest club we have
+    if (clubIdx - clubUpX <= 0) {
+      return 'AW';
+    }
+    return Object.keys(clubDistances)[clubIdx - clubUpX] as Clubs;
   }
 
   return options[clubUpX];
