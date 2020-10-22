@@ -9,7 +9,7 @@ type Lie = {
   distanceToHole: number;
 };
 
-type Clubs = 'P' | 'PW' | '9' | '8' | '7' | '6' | '5' | '4' | '3' | 'D';
+type Clubs = 'P' | 'AW' | 'PW' | '9' | '8' | '7' | '6' | '5' | '4' | '3' | 'D';
 
 type ClubProficiency = Record<Clubs, number>;
 
