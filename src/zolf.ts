@@ -104,7 +104,7 @@ export class Person implements Player {
       this.lie.condition
     );
 
-    // console.log(idealClub, brainSizeClub);
+    // If the ideal club is a Putter, we want to hit the putter
     playersClub = idealClub === 'P' ? idealClub : brainSizeClub;
 
     const isOnGreen = playersClub === 'P';
@@ -112,15 +112,17 @@ export class Person implements Player {
     // todo: Apply Weather effects here
 
     console.log(`${this.name} is hitting their ${playersClub}`);
-    // console.log(isOnGreen);
 
+    // Use proficiency as a percentage for how far the shot will go. Based on the lower bound of the club's distance
     let shotDistance =
       this.stats.proficiency[playersClub] * clubDistances[playersClub][0];
 
+    // The distance of the slice
     let inaccuracy = 0;
 
     const didControlRoll = this.rollControl();
-    // player rolls control, adjust shot distance
+    // player rolls control, adjust shot distance.
+    // The player can't slice a putt
     if (didControlRoll && !isOnGreen) {
       inaccuracy = shotDistance * didControlRoll;
       console.log(`${this.name} sliced, losing ${inaccuracy}yds`);
@@ -142,7 +144,6 @@ export class Person implements Player {
       }
     }
 
-    // use slice distance (as inaccuracy) to determine the new lie
     this.proceedToNextShot({ shotDistance, inaccuracy });
   }
 
@@ -163,6 +164,7 @@ export class Person implements Player {
     }
     this.strokes += 1;
 
+    // Manually ensure the lie is set to Green if the distance to the hole is less than the putters upper bound distance
     if (inaccuracy === -1 || this.lie.distanceToHole < clubDistances['P'][1])
       this.lie.condition = 'Green';
     else if (inaccuracy === 0) this.lie.condition = 'Fairway';
