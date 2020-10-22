@@ -1,18 +1,25 @@
 import { players } from './go';
 import { c, clubDistances, ed, sleep } from './utils';
 
+function getRandomIntInclusive(min: number, max: number) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.random() * (max - min + 1) + min; //The maximum is inclusive and the minimum is inclusive
+}
+
 function guessProficiency(): ClubProficiency {
   return {
-    '3': Math.random(),
-    '4': Math.random(),
-    '5': Math.random(),
-    '6': Math.random(),
-    '7': Math.random(),
-    '8': Math.random(),
-    '9': Math.random(),
-    D: Math.random(),
-    P: Math.random(),
-    PW: Math.random(),
+    '3': getRandomIntInclusive(0.75, 0.99),
+    '4': getRandomIntInclusive(0.75, 0.99),
+    '5': getRandomIntInclusive(0.75, 0.99),
+    '6': getRandomIntInclusive(0.75, 0.99),
+    '7': getRandomIntInclusive(0.75, 0.99),
+    '8': getRandomIntInclusive(0.75, 0.99),
+    '9': getRandomIntInclusive(0.75, 0.99),
+    D: getRandomIntInclusive(0.75, 0.99),
+    P: getRandomIntInclusive(0.75, 0.99),
+    PW: getRandomIntInclusive(0.75, 0.99),
+    AW: getRandomIntInclusive(0.75, 0.99),
   };
 }
 export class Person implements Player {
@@ -97,6 +104,7 @@ export class Person implements Player {
       this.lie.condition
     );
 
+    // console.log(idealClub, brainSizeClub);
     playersClub = idealClub === 'P' ? idealClub : brainSizeClub;
 
     const isOnGreen = playersClub === 'P';
@@ -104,7 +112,7 @@ export class Person implements Player {
     // todo: Apply Weather effects here
 
     console.log(`${this.name} is hitting their ${playersClub}`);
-    console.log(isOnGreen);
+    // console.log(isOnGreen);
 
     let shotDistance =
       this.stats.proficiency[playersClub] * clubDistances[playersClub][0];
@@ -115,18 +123,18 @@ export class Person implements Player {
     // player rolls control, adjust shot distance
     if (didControlRoll && !isOnGreen) {
       inaccuracy = shotDistance * didControlRoll;
-      console.log(`${this.name} sliced, losing ${inaccuracy} yards`);
+      console.log(`${this.name} sliced, losing ${inaccuracy}yds`);
       shotDistance -= inaccuracy;
     }
     if (isOnGreen) {
-      console.log(`${this.name} is on the green!`);
+      console.log(`${this.name} is on the green`);
       inaccuracy = -1;
       const didRollFinesse = Math.random() > 0.45;
       if (didRollFinesse) {
         shotDistance = this.lie.distanceToHole;
         this.proceedToNextHole();
 
-        console.log(`${this.name} sunk a putt!`);
+        console.log(`${this.name} sunk a putt.`);
         return;
       } else {
         shotDistance =
@@ -146,19 +154,25 @@ export class Person implements Player {
     shotDistance: number;
     inaccuracy?: number;
   }) {
-    // console.log(shotDistance, this.lie.distanceToHole);
+    // instead of a negative distance, simulate that the ball is on the other side of the hole
+    if (shotDistance > this.lie.distanceToHole) {
+      const overshootYardage = shotDistance - this.lie.distanceToHole;
+      this.lie.distanceToHole = overshootYardage;
+    } else {
+      this.lie.distanceToHole -= shotDistance;
+    }
     this.strokes += 1;
-    this.lie.distanceToHole -= shotDistance;
 
-    if (inaccuracy === -1) this.lie.condition = 'Green';
+    if (inaccuracy === -1 || this.lie.distanceToHole < clubDistances['P'][1])
+      this.lie.condition = 'Green';
     else if (inaccuracy === 0) this.lie.condition = 'Fairway';
     else if (inaccuracy > 10 && inaccuracy < 20) this.lie.condition = 'Rough';
     else if (inaccuracy > 20) this.lie.condition = 'Heavy Rough';
 
     console.log(
-      `${this.name} is walking to his ball (shot ${this.strokes}) ${shotDistance} yards out, in the ${this.lie.condition}`
+      `${this.name} (shot #${this.strokes}), ${shotDistance}yds, in ${this.lie.condition}. ${this.lie.distanceToHole}yds remain`
     );
-    await sleep((Math.random() * (5 - 3 + 1) + 3) * 1000); // 0-3 seconds
+    // await sleep((Math.random() * (5 - 3 + 1) + 3) * 1000); // 0-3 seconds
     this.swing();
   }
 
