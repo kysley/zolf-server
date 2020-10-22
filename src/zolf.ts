@@ -1,4 +1,5 @@
-import { ed, getClubFromDistanceToHole, sleep } from './utils';
+import { players } from './go';
+import { c, clubDistances, ed, sleep } from './utils';
 
 function guessProficiency(): ClubProficiency {
   return {
@@ -87,14 +88,16 @@ export class Person implements Player {
 
   swing() {
     // The club the player should hit based off of distance
-    const idealClub = getClubFromDistanceToHole(this.lie.distanceToHole);
-    let playersClub = idealClub;
+    // const idealClub = getClubFromDistanceToHole(this.lie.distanceToHole);
+    let playersClub: Clubs;
+    const idealClub = c(this.lie.distanceToHole, this.lie.condition);
 
-    const brainSizeClub = getClubFromDistanceToHole(
-      this.lie.distanceToHole + this.rollBrainSize()
+    const brainSizeClub = c(
+      this.lie.distanceToHole + this.rollBrainSize(),
+      this.lie.condition
     );
 
-    playersClub = idealClub === 'P' ? playersClub : brainSizeClub;
+    playersClub = idealClub === 'P' ? idealClub : brainSizeClub;
 
     const isOnGreen = playersClub === 'P';
 
@@ -104,7 +107,7 @@ export class Person implements Player {
     console.log(isOnGreen);
 
     let shotDistance =
-      this.stats.proficiency[playersClub] * this.lie.distanceToHole;
+      this.stats.proficiency[playersClub] * clubDistances[playersClub][0];
 
     let inaccuracy = 0;
 
@@ -143,7 +146,7 @@ export class Person implements Player {
     shotDistance: number;
     inaccuracy?: number;
   }) {
-    console.log(shotDistance, this.lie.distanceToHole);
+    // console.log(shotDistance, this.lie.distanceToHole);
     this.strokes += 1;
     this.lie.distanceToHole -= shotDistance;
 
