@@ -10,7 +10,7 @@ for (let i = 0; i < 5; i++) {
       name: `Player${i}`,
       id: String(i),
       course: testCourse,
-    })
+    } as Player)
   );
 }
 
