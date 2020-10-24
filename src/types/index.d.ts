@@ -22,7 +22,28 @@
 //   return person;
 // };
 
-type Clubs = 'P' | 'AW' | 'PW' | '9' | '8' | '7' | '6' | '5' | '4' | '3' | 'D';
+declare enum Clubs {
+  'P' = 'P',
+  'AW' = 'AW',
+  'PW' = 'PW',
+  '9I' = '9I',
+  '8I' = '8I',
+  '7I' = '7I',
+  '6I' = '6I',
+  '5I' = '5I',
+  '4I' = '4I',
+  '3I' = '3I',
+  'D' = 'D',
+}
+
+declare enum Lies { // sounds like my ex
+  'Rough',
+  'Fescue',
+  'Heavy Rough',
+  'Fairway',
+  'Teebox',
+  'Green',
+}
 
 type ClubProficiency = Record<Clubs, number>;
 
@@ -39,8 +60,13 @@ type Course = {
 
 type Affliction = {};
 
-type WeatherNames = 'Hail';
-type AfflictionNames = 'Roid Rage'; // I lol'd at this
+declare enum WeatherNames {
+  'Hail' = 'Hail',
+}
+
+declare enum AfflictionNames {
+  'Roid Rage',
+} // I lol'd at this
 
 type EventMessage = {
   info: {

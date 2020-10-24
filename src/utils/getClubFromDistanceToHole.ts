@@ -9,7 +9,9 @@ export function c(d: number, condition: Lie['condition']): Clubs {
     return is > min && is < max;
   }
 
-  let options = Object.keys(clubDistances).reduce((acc, key) => {
+  const x = Object.keys(clubDistances);
+
+  let options = Object.keys(clubDistances).reduce<Clubs[]>((acc, key) => {
     const _d = clubDistances[key as Clubs];
 
     // If the distance to the hole is within the clubs' distance bounds
@@ -20,15 +22,17 @@ export function c(d: number, condition: Lie['condition']): Clubs {
     }
 
     return acc;
-  }, [] as Clubs[]);
+  }, []);
 
   // console.log(clubUpX, options, d, condition);
 
   // Always return putter if we can
-  if (options.includes('P')) return 'P';
-  if (d > clubDistances['D'][0] && condition === 'Teebox') return 'D';
-  else if (d > clubDistances['D'][0]) options = ['3', '4', '5', '6'];
+  if (options.includes(Clubs.P)) return Clubs.P;
+  if (d > clubDistances['D'][0] && condition === 'Teebox') return Clubs['D'];
+  else if (d > clubDistances['D'][0])
+    options = [Clubs['3I'], Clubs['4I'], Clubs['5I'], Clubs['6I']];
 
+  // Perhaps we use the brain size stat here..?
   const randomClubFromOptions =
     options[Math.floor(Math.random() * options.length)];
 
@@ -39,7 +43,7 @@ export function c(d: number, condition: Lie['condition']): Clubs {
   if (clubIdx !== -1) {
     // We are clubbing up too many times, return highest club we have
     if (clubIdx - clubUpX <= 0) {
-      return 'AW';
+      return Clubs.AW;
     }
     return Object.keys(clubDistances)[clubIdx - clubUpX] as Clubs;
   }
@@ -48,15 +52,15 @@ export function c(d: number, condition: Lie['condition']): Clubs {
 }
 
 export const clubDistances: Record<Clubs, number[]> = {
-  P: [0, 40],
-  AW: [40, 120],
-  PW: [120, 140],
-  '9': [140, 170],
-  '8': [155, 185],
-  '7': [170, 200],
-  '6': [180, 220],
-  '5': [190, 230],
-  '4': [200, 250],
-  '3': [210, 260],
-  D: [250, 275],
+  [Clubs.P]: [0, 40],
+  [Clubs.AW]: [40, 120],
+  [Clubs.PW]: [120, 140],
+  [Clubs['8I']]: [155, 185],
+  [Clubs['9I']]: [140, 170],
+  [Clubs['7I']]: [170, 200],
+  [Clubs['6I']]: [180, 220],
+  [Clubs['5I']]: [190, 230],
+  [Clubs['4I']]: [200, 250],
+  [Clubs['3I']]: [210, 260],
+  [Clubs.D]: [250, 275],
 };

@@ -9,13 +9,13 @@ function getRandomIntInclusive(min: number, max: number) {
 
 function guessProficiency(): ClubProficiency {
   return {
-    '3': getRandomIntInclusive(0.75, 0.99),
-    '4': getRandomIntInclusive(0.75, 0.99),
-    '5': getRandomIntInclusive(0.75, 0.99),
-    '6': getRandomIntInclusive(0.75, 0.99),
-    '7': getRandomIntInclusive(0.75, 0.99),
-    '8': getRandomIntInclusive(0.75, 0.99),
-    '9': getRandomIntInclusive(0.75, 0.99),
+    '3I': getRandomIntInclusive(0.75, 0.99),
+    '4I': getRandomIntInclusive(0.75, 0.99),
+    '5I': getRandomIntInclusive(0.75, 0.99),
+    '6I': getRandomIntInclusive(0.75, 0.99),
+    '7I': getRandomIntInclusive(0.75, 0.99),
+    '8I': getRandomIntInclusive(0.75, 0.99),
+    '9I': getRandomIntInclusive(0.75, 0.99),
     D: getRandomIntInclusive(0.75, 0.99),
     P: getRandomIntInclusive(0.75, 0.99),
     PW: getRandomIntInclusive(0.75, 0.99),
@@ -49,7 +49,7 @@ enum LieConditions {
   HEAVY_ROUGH = 'Heavy Rough',
   FAIRWAY = 'Fairway',
   TEEBOX = 'Teebox',
-  GREEN = 'Green'
+  GREEN = 'Green',
 }
 
 class CurrentLie implements Lie {
@@ -133,7 +133,7 @@ export class Person implements Player {
     // const idealClub = getClubFromDistanceToHole(this.lie.distanceToHole);
     let playersClub: Clubs;
 
-    if(this.lie && this.stats) {
+    if (this.lie && this.stats) {
       const idealClub = c(this.lie.distanceToHole, this.lie.condition);
 
       const brainSizeClub = c(
@@ -221,9 +221,9 @@ export class Person implements Player {
   async proceedToNextHole() {
     if (this.lie && this.scoreCard && this.strokes) {
       console.log(
-        `${this.name} is walking to the next hole, hole ${this.hole}. He shot a ${
-          this.strokes + 1
-        }`
+        `${this.name} is walking to the next hole, hole ${
+          this.hole
+        }. He shot a ${this.strokes + 1}`
       );
       this.scoreCard.push(this.strokes + 1); // account for the shot that sunk the ball
       this.hole += 1;

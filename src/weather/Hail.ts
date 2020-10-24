@@ -14,7 +14,7 @@ class Hail implements WeatherEffect {
       info: {
         name: 'Hail Storm',
         happening: `Well Jim, ${player.name}'s ball was hit by stray hail!`,
-        triggeredBy: 'Hail',
+        triggeredBy: WeatherNames.Hail,
       },
     };
     return event;
