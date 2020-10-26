@@ -1,9 +1,11 @@
+import { Clubs, Lie, Lies } from '../types';
+
 export function c(d: number, condition: Lie['condition']): Clubs {
   let clubUpX = 0;
   // Based on the lie, we will club up a certain number of times
-  if (condition === 'Rough') clubUpX = 1;
-  else if (condition === 'Heavy Rough') clubUpX = 2;
-  else if (condition === 'Fescue') clubUpX = 3;
+  if (condition === Lies.Rough) clubUpX = 1;
+  else if (condition === Lies['Heavy Rough']) clubUpX = 2;
+  else if (condition === Lies.Fescue) clubUpX = 3;
 
   function isBetween(min: number, max: number, is: number, inclusive = false) {
     return is > min && is < max;
@@ -17,7 +19,7 @@ export function c(d: number, condition: Lie['condition']): Clubs {
     // If the distance to the hole is within the clubs' distance bounds
     if (isBetween(_d[0], _d[1], d)) {
       // For now, lets not let them hit the driver off the fairway (etc.) maybe we can revisit this idea
-      if (key === 'D' && condition !== 'Teebox') return acc;
+      if (key === 'D' && condition !== Lies.Teebox) return acc;
       acc.push(key as Clubs);
     }
 
@@ -28,7 +30,7 @@ export function c(d: number, condition: Lie['condition']): Clubs {
 
   // Always return putter if we can
   if (options.includes(Clubs.P)) return Clubs.P;
-  if (d > clubDistances['D'][0] && condition === 'Teebox') return Clubs['D'];
+  if (d > clubDistances['D'][0] && condition === Lies.Teebox) return Clubs['D'];
   else if (d > clubDistances['D'][0])
     options = [Clubs['3I'], Clubs['4I'], Clubs['5I'], Clubs['6I']];
 

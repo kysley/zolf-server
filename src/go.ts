@@ -1,5 +1,5 @@
-import { Person } from './zolf';
-import { RoundController } from './round';
+import { Person } from './entities/Player';
+import { RoundController } from './controllers/RoundController';
 import { testCourse } from './stubs';
 
 export const players: Person[] = [];

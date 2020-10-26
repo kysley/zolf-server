@@ -1,5 +1,5 @@
 import { testCourse } from './stubs';
-import { Hail } from './weather/Hail';
+import { Hail } from './entities/weather/Hail';
 
 export class RoundController implements Round {
   course = testCourse;
