@@ -21,8 +21,7 @@
 // const returnPerson: ReturnPerson = (person) => {
 //   return person;
 // };
-
-declare enum Clubs {
+export enum Clubs {
   'P' = 'P',
   'AW' = 'AW',
   'PW' = 'PW',
@@ -36,7 +35,7 @@ declare enum Clubs {
   'D' = 'D',
 }
 
-declare enum Lies { // sounds like my ex
+export enum Lies { // sounds like my ex
   'Rough',
   'Fescue',
   'Heavy Rough',
@@ -45,26 +44,25 @@ declare enum Lies { // sounds like my ex
   'Green',
 }
 
-type ClubProficiency = Record<Clubs, number>;
+export type ClubProficiency = Record<Clubs, number>;
 
-type Hole = {
+export type Hole = {
   yardage: number;
   par: number;
 };
 
-type Course = {
+export type Course = {
   name: string;
   length: number;
   holes: Hole[];
 };
 
-type Affliction = {};
+export type Affliction = {};
 
-declare enum WeatherNames {
+export enum WeatherNames {
   'Hail' = 'Hail',
 }
-
-declare enum AfflictionNames {
+export enum AfflictionNames {
   'Roid Rage',
 } // I lol'd at this
 
@@ -78,7 +76,7 @@ type EventMessage = {
 };
 
 // Changed this to an interface to add extensibility
-interface Stats {
+export interface Stats {
   control: number;
   patience: number;
   brainSize: number;
@@ -87,18 +85,18 @@ interface Stats {
   proficiency: ClubProficiency;
 }
 
-interface Lie {
-  condition: string;
+export interface Lie {
+  condition: Lies;
   distanceToHole: number;
 }
 
-interface Round {
+export interface Round {
   players: Player[];
   course: Course;
   weather: WeatherEffect;
 }
 
-interface Player {
+export interface Player {
   id: string;
   name: string;
   hole: number;
@@ -114,7 +112,7 @@ interface Player {
   swing(): void;
 }
 
-interface WeatherEffect {
+export interface WeatherEffect {
   name: string;
   roll({ player }: { player?: Player }): boolean;
   effect({ player }: { player?: Player }): EventMessage; // string will represent an event that is returned
