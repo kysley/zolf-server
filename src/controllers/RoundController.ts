@@ -1,5 +1,6 @@
-import { testCourse } from './stubs';
-import { Hail } from './entities/weather/Hail';
+import { testCourse } from '../stubs';
+import { Hail } from '../entities/weather/Hail';
+import { Player, Round } from '../types';
 
 export class RoundController implements Round {
   course = testCourse;
@@ -11,6 +12,6 @@ export class RoundController implements Round {
   }
 
   start() {
-    this.players.forEach(async (player) => await player.swing());
+    this.players.forEach(async (player) => player.swing());
   }
 }

@@ -1,3 +1,13 @@
+import {
+  Affliction,
+  ClubProficiency,
+  Clubs,
+  Course,
+  Lie,
+  Lies,
+  Player,
+  Stats,
+} from '../types';
 import { c, clubDistances, ed, sleep } from '../utils';
 
 function getRandomIntInclusive(min: number, max: number) {
@@ -42,20 +52,11 @@ class PlayerStats implements Stats {
   }
 }
 
-enum LieConditions {
-  ROUGH = 'Rough',
-  FESCUE = 'Fescue',
-  HEAVY_ROUGH = 'Heavy Rough',
-  FAIRWAY = 'Fairway',
-  TEEBOX = 'Teebox',
-  GREEN = 'Green',
-}
-
 class CurrentLie implements Lie {
-  public condition: string;
+  public condition: Lies;
   public distanceToHole: number;
 
-  constructor(condition: string, distanceToHole: number) {
+  constructor(condition: Lies, distanceToHole: number) {
     this.condition = condition;
     this.distanceToHole = distanceToHole;
   }
@@ -70,13 +71,13 @@ export class Person implements Player {
 
   public scoreCard: Array<number>;
   public afflictions?: Array<Affliction>;
-  public strokes?: number;
-  public stats?: PlayerStats;
-  public lie?: Lie;
+  public strokes: number;
+  public stats: PlayerStats;
+  public lie: Lie;
 
   constructor(player: Player) {
     this.stats = player.stats || this.generatePlayerStats();
-    this.hole = player.hole;
+    this.hole = player.hole ?? 0;
     this.id = player.id;
     this.name = player.name;
     this.scoreCard = player.scoreCard || [];
@@ -98,7 +99,7 @@ export class Person implements Player {
   }
 
   private setFirstLie(course: Course): Lie {
-    return new CurrentLie(LieConditions.TEEBOX, course.holes[0].yardage);
+    return new CurrentLie(Lies.Teebox, course.holes[0].yardage);
   }
 
   rollBrainSize() {
@@ -194,47 +195,44 @@ export class Person implements Player {
     shotDistance: number;
     inaccuracy?: number;
   }) {
-    if (this.lie && this.strokes) {
-      // instead of a negative distance, simulate that the ball is on the other side of the hole
-      if (shotDistance > this.lie.distanceToHole) {
-        const overshootYardage = shotDistance - this.lie.distanceToHole;
-        this.lie.distanceToHole = overshootYardage;
-      } else {
-        this.lie.distanceToHole -= shotDistance;
-      }
-      this.strokes += 1;
-
-      // Manually ensure the lie is set to Green if the distance to the hole is less than the putters upper bound distance
-      if (inaccuracy === -1 || this.lie.distanceToHole < clubDistances['P'][1])
-        this.lie.condition = 'Green';
-      else if (inaccuracy === 0) this.lie.condition = 'Fairway';
-      else if (inaccuracy > 10 && inaccuracy < 20) this.lie.condition = 'Rough';
-      else if (inaccuracy > 20) this.lie.condition = 'Heavy Rough';
-
-      console.log(
-        `${this.name} (shot #${this.strokes}), ${shotDistance}yds, in ${this.lie.condition}. ${this.lie.distanceToHole}yds remain`
-      );
-      // await sleep((Math.random() * (5 - 3 + 1) + 3) * 1000); // 0-3 seconds
-      this.swing();
+    // instead of a negative distance, simulate that the ball is on the other side of the hole
+    if (shotDistance > this.lie.distanceToHole) {
+      const overshootYardage = shotDistance - this.lie.distanceToHole;
+      this.lie.distanceToHole = overshootYardage;
     } else {
-      console.log(this.strokes);
+      this.lie.distanceToHole -= shotDistance;
     }
+    this.strokes += 1;
+
+    // Manually ensure the lie is set to Green if the distance to the hole is less than the putters upper bound distance
+    if (inaccuracy === -1 || this.lie.distanceToHole < clubDistances['P'][1])
+      this.lie.condition = Lies.Green;
+    else if (inaccuracy === 0) this.lie.condition = Lies.Fairway;
+    else if (inaccuracy > 10 && inaccuracy < 20)
+      this.lie.condition = Lies.Rough;
+    else if (inaccuracy > 20) this.lie.condition = Lies['Heavy Rough'];
+
+    console.log(
+      `${this.name} (shot #${this.strokes}), ${shotDistance}yds, in ${this.lie.condition}. ${this.lie.distanceToHole}yds remain`
+    );
+    // await sleep((Math.random() * (5 - 3 + 1) + 3) * 1000); // 0-3 seconds
+    this.swing();
   }
 
   async proceedToNextHole() {
-    if (this.lie && this.scoreCard && this.strokes) {
-      console.log(
-        `${this.name} is walking to the next hole, hole ${
-          this.hole
-        }. He shot a ${this.strokes + 1}`
-      );
-      this.scoreCard.push(this.strokes + 1); // account for the shot that sunk the ball
-      this.hole += 1;
-      this.strokes = 0;
-      this.lie.condition = 'Teebox';
+    console.log(
+      `${this.name} is walking to the next hole, hole ${this.hole}. He shot a ${
+        this.strokes + 1
+      }`
+    );
+    this.scoreCard.push(this.strokes + 1); // account for the shot that sunk the ball
+    this.hole += 1;
+    this.strokes = 0;
+    this.lie.condition = Lies.Teebox;
+    this.lie.distanceToHole = this.course.holes[this.hole].yardage;
 
-      await sleep((Math.random() + 1 * 5) * 1000);
-    }
+    await sleep((Math.random() + 1 * 5) * 1000);
+    this.swing();
   }
 
   start() {
