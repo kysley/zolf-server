@@ -1,4 +1,5 @@
 import produce from 'immer';
+import { WeatherEffect, Player, WeatherNames, EventMessage } from '../../types';
 
 class Hail implements WeatherEffect {
   name = 'Hail';

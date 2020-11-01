@@ -66,7 +66,7 @@ export enum AfflictionNames {
   'Roid Rage',
 } // I lol'd at this
 
-type EventMessage = {
+export type EventMessage = {
   info: {
     name: string;
     happening: string;
