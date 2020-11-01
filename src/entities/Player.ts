@@ -75,9 +75,13 @@ export class Person implements Player {
   public stats: PlayerStats;
   public lie: Lie;
 
+  // Execution timers - measures the execution time of each player
+  private startTime!: any; // Should be type => NodeJS.HRTime but didn't want to deal with TS errors on assignment (line 138)
+  private endTime!: any; // Should be type => NodeJS.HRTime but didn't want to deal with TS errors on assignment (line 238)
+
   constructor(player: Player) {
     this.stats = player.stats || this.generatePlayerStats();
-    this.hole = player.hole ?? 0;
+    this.hole = player.hole ?? 1;
     this.id = player.id;
     this.name = player.name;
     this.scoreCard = player.scoreCard || [];
@@ -128,7 +132,11 @@ export class Person implements Player {
     return false;
   }
 
-  swing() {
+  async swing() {
+
+    if (this.hole == 1) {
+      this.startTime = process.hrtime();
+    }
     // The club the player should hit based off of distance
     // const idealClub = getClubFromDistanceToHole(this.lie.distanceToHole);
     let playersClub: Clubs;
@@ -152,7 +160,7 @@ export class Person implements Player {
 
       // Use proficiency as a percentage for how far the shot will go. Based on the lower bound of the club's distance
       let shotDistance =
-        this.stats.proficiency[playersClub] * clubDistances[playersClub][0];
+        this.stats.proficiency[playersClub] * clubDistances[playersClub][0]; // This sometimes has unexpected behaviour -> undefined
 
       // The distance of the slice
       let inaccuracy = 0;
@@ -165,15 +173,15 @@ export class Person implements Player {
         console.log(`${this.name} sliced, losing ${inaccuracy}yds`);
         shotDistance -= inaccuracy;
       }
+
       if (isOnGreen) {
         console.log(`${this.name} is on the green`);
         inaccuracy = -1;
         const didRollFinesse = Math.random() > 0.45;
         if (didRollFinesse) {
           shotDistance = this.lie.distanceToHole;
-          this.proceedToNextHole();
-
           console.log(`${this.name} sunk a putt.`);
+          this.proceedToNextHole();
           return;
         } else {
           shotDistance =
@@ -220,19 +228,27 @@ export class Person implements Player {
   }
 
   async proceedToNextHole() {
-    console.log(
-      `${this.name} is walking to the next hole, hole ${this.hole}. He shot a ${
-        this.strokes + 1
-      }`
-    );
     this.scoreCard.push(this.strokes + 1); // account for the shot that sunk the ball
     this.hole += 1;
+
+    // Do not proceed if it is the end of the round
+    // TODO: refactor with finished callback?
+    if (this.hole > 18) {
+      console.log(`${this.name} finished the round, He shot a ${this.strokes + 1}`);
+      this.endTime = process.hrtime(this.startTime)
+      console.log('Execution time: %ds %dms', this.endTime[0], this.endTime[1] / 1000000)
+      return;
+    }
+
+    console.log(
+      `${this.name} is walking to the next hole, hole ${this.hole}. He shot a ${this.strokes + 1
+      }`
+    );
+
     this.strokes = 0;
     this.lie.condition = Lies.Teebox;
     this.lie.distanceToHole = this.course.holes[this.hole].yardage;
-
-    await sleep((Math.random() + 1 * 5) * 1000);
-    this.swing();
+    this.swing()
   }
 
   start() {
