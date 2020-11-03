@@ -20,7 +20,6 @@ for (let i = 0; i < 4; i++) {
 
 const controller = new RoundController(players);
 
-
 async function t() {
   golfer.set('a', ['name', 'evan2', 'age', 35]);
   golfer.set('b', 'food', 'ass');
@@ -32,9 +31,13 @@ async function t() {
   //
   // NOTE: Time taken for each player isn't determined by how it prints to console
   // check the execution time log at the end of each players round
-  players.forEach(async (player: Player) => {
-    await controller.start(player);
-  });
+  // players.forEach(async (player: Player) => {
+  //   await controller.start(player);
+  // });
+  controller.playGroups();
+  // for (const p in players) {
+  //   await controller.start(players[p]);
+  // }
 }
 
 t();

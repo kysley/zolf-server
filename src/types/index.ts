@@ -102,11 +102,11 @@ export interface Player {
   hole: number;
   course: Course;
 
-  scoreCard?: number[];
+  scoreCard: number[];
   afflictions?: Affliction[];
-  strokes?: number;
-  stats?: Stats;
-  lie?: Lie;
+  strokes: number;
+  stats: Stats;
+  lie: Lie;
 
   start(): void;
   swing(): void;

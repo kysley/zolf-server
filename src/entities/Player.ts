@@ -133,7 +133,6 @@ export class Person implements Player {
   }
 
   async swing() {
-
     if (this.hole == 1) {
       this.startTime = process.hrtime();
     }
@@ -223,8 +222,8 @@ export class Person implements Player {
     console.log(
       `${this.name} (shot #${this.strokes}), ${shotDistance}yds, in ${this.lie.condition}. ${this.lie.distanceToHole}yds remain`
     );
-    // await sleep((Math.random() * (5 - 3 + 1) + 3) * 1000); // 0-3 seconds
-    this.swing();
+    await sleep((Math.random() * (5 - 3 + 1) + 3) * 1000); // 0-3 seconds
+    // this.swing();
   }
 
   async proceedToNextHole() {
@@ -234,21 +233,28 @@ export class Person implements Player {
     // Do not proceed if it is the end of the round
     // TODO: refactor with finished callback?
     if (this.hole > 18) {
-      console.log(`${this.name} finished the round, He shot a ${this.strokes + 1}`);
-      this.endTime = process.hrtime(this.startTime)
-      console.log('Execution time: %ds %dms', this.endTime[0], this.endTime[1] / 1000000)
+      console.log(
+        `${this.name} finished the round, He shot a ${this.strokes + 1}`
+      );
+      this.endTime = process.hrtime(this.startTime);
+      console.log(
+        'Execution time: %ds %dms',
+        this.endTime[0],
+        this.endTime[1] / 1000000
+      );
       return;
     }
 
     console.log(
-      `${this.name} is walking to the next hole, hole ${this.hole}. He shot a ${this.strokes + 1
+      `${this.name} is walking to the next hole, hole ${this.hole}. He shot a ${
+        this.strokes + 1
       }`
     );
 
     this.strokes = 0;
     this.lie.condition = Lies.Teebox;
     this.lie.distanceToHole = this.course.holes[this.hole].yardage;
-    this.swing()
+    // this.swing();
   }
 
   start() {
