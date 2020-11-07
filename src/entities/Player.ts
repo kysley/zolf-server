@@ -74,6 +74,7 @@ export class Person implements Player {
   public strokes: number;
   public stats: PlayerStats;
   public lie: Lie;
+  public done: boolean = false;
 
   // Execution timers - measures the execution time of each player
   private startTime!: any; // Should be type => NodeJS.HRTime but didn't want to deal with TS errors on assignment (line 138)
@@ -140,7 +141,7 @@ export class Person implements Player {
     // const idealClub = getClubFromDistanceToHole(this.lie.distanceToHole);
     let playersClub: Clubs;
 
-    if (this.lie && this.stats) {
+    if (!this.done) {
       const idealClub = c(this.lie.distanceToHole, this.lie.condition);
 
       const brainSizeClub = c(
@@ -180,7 +181,8 @@ export class Person implements Player {
         if (didRollFinesse) {
           shotDistance = this.lie.distanceToHole;
           console.log(`${this.name} sunk a putt.`);
-          this.proceedToNextHole();
+          // this.proceedToNextHole();
+          this.done = true;
           return;
         } else {
           shotDistance =
@@ -229,6 +231,7 @@ export class Person implements Player {
   async proceedToNextHole() {
     this.scoreCard.push(this.strokes + 1); // account for the shot that sunk the ball
     this.hole += 1;
+    this.done = false;
 
     // Do not proceed if it is the end of the round
     // TODO: refactor with finished callback?
