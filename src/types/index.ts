@@ -1,27 +1,6 @@
-// NOTE: We should think about how these types are being used. If there is any case
-// where we would be passing props to them ie. { prop: value } as Type then it would
-// be better to write them as interfaces.
-//
-// NOTE: Types are mostly used for functions or complex types ie. tuples
-// Complex type example:
-//
-// type MyComplexType = [string, number, Array<string>]
-//
-// Function example:
-//
-// type Person = {
-//   name: string,
-//   age: number
-// };
-//
-// type ReturnPerson = (
-//   person: Person
-// ) => Person;
-//
-// const returnPerson: ReturnPerson = (person) => {
-//   return person;
-// };
-export enum Clubs {
+import {GolfPlayer} from '../entities/Player';
+
+export enum Club {
   'P' = 'P',
   'AW' = 'AW',
   'PW' = 'PW',
@@ -35,20 +14,22 @@ export enum Clubs {
   'D' = 'D',
 }
 
-export enum Lies { // sounds like my ex
-  'Rough',
-  'Fescue',
-  'Heavy Rough',
-  'Fairway',
-  'Teebox',
-  'Green',
+export enum Lies {
+  'Rough' = 'Rough',
+  'Fescue' = 'Fescue',
+  'Heavy Rough' = 'Heavy Rough',
+  'Fairway' = 'Fairway',
+  'Teebox' = 'Teebox',
+  'Green' = 'Green',
+  'Bunker' = 'Bunker',
 }
 
-export type ClubProficiency = Record<Clubs, number>;
+export type ClubProficiency = Record<Club, number>;
 
 export type Hole = {
   yardage: number;
   par: number;
+  number: number;
 };
 
 export type Course = {
@@ -59,28 +40,25 @@ export type Course = {
 
 export type Affliction = {};
 
-export enum WeatherNames {
-  'Hail' = 'Hail',
+export enum Weather {
+  Hail = 'Hail',
 }
-export enum AfflictionNames {
-  'Roid Rage',
-} // I lol'd at this
+export enum Status {}
 
 export type EventMessage = {
   info: {
     name: string;
     happening: string;
-    triggeredBy: WeatherNames | AfflictionNames;
+    triggeredBy: Weather | Status;
   };
   state?: Stats;
 };
 
 // Changed this to an interface to add extensibility
 export interface Stats {
-  control: number;
-  patience: number;
-  brainSize: number;
-  tilt: number;
+  flair: number;
+  mindset: number;
+  strength: number;
   alive: boolean;
   proficiency: ClubProficiency;
 }
@@ -91,29 +69,13 @@ export interface Lie {
 }
 
 export interface Round {
-  players: Player[];
+  players: GolfPlayer[];
   course: Course;
   weather: WeatherEffect;
 }
 
-export interface Player {
-  id: string;
-  name: string;
-  hole: number;
-  course: Course;
-
-  scoreCard: number[];
-  afflictions?: Affliction[];
-  strokes: number;
-  stats: Stats;
-  lie: Lie;
-
-  start(): void;
-  swing(): void;
-}
-
 export interface WeatherEffect {
   name: string;
-  roll({ player }: { player?: Player }): boolean;
-  effect({ player }: { player?: Player }): EventMessage; // string will represent an event that is returned
+  roll({player}: {player?: GolfPlayer}): boolean;
+  effect({player}: {player?: GolfPlayer}): EventMessage; // string will represent an event that is returned
 }
